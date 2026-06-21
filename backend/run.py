@@ -7,3 +7,15 @@ if __name__ == "__main__":
     # Disable reload in production to conserve memory and improve performance
     reload = os.getenv("ENV", "development").lower() == "development"
     uvicorn.run("app.main:app", host="0.0.0.0", port=port, reload=reload)
+
+
+
+if __name__ == "__main__":
+    print("PORT ENV =", os.getenv("PORT"))
+
+    uvicorn.run(
+        "app.main:app",
+        host="0.0.0.0",
+        port=int(os.getenv("PORT", 8000)),
+        reload=False,
+    )
