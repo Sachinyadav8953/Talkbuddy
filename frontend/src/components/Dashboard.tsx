@@ -147,18 +147,18 @@ export const Dashboard: React.FC = () => {
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8 space-y-8">
+    <div className="max-w-5xl mx-auto px-3 sm:px-4 py-6 sm:py-8 space-y-6 sm:space-y-8">
       <div>
-        <h1 className="text-3xl font-extrabold tracking-tight text-white mb-2 bg-gradient-to-r from-white via-slate-200 to-violet-400 bg-clip-text text-transparent">
+        <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white mb-2 bg-gradient-to-r from-white via-slate-200 to-violet-400 bg-clip-text text-transparent">
           Student Progress Dashboard
         </h1>
-        <p className="text-slate-400 font-medium text-sm">
+        <p className="text-slate-400 font-medium text-xs sm:text-sm">
           Track speaking performance, review average grades, and view historical details.
         </p>
       </div>
 
       {/* Main Aggregated Scores */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
         <div className="glass-card rounded-3xl p-6 border border-white/5 relative overflow-hidden">
           <div className="flex items-center justify-between mb-4">
             <span className="text-xs text-violet-400 font-bold uppercase tracking-wider">Grammar</span>
@@ -197,9 +197,9 @@ export const Dashboard: React.FC = () => {
       </div>
 
       {/* Analytics Graph & Topic Breakdowns */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
         {/* SVG Progress Graph */}
-        <div className="lg:col-span-8 glass-card rounded-3xl p-6 border border-white/5 flex flex-col h-[320px]">
+        <div className="lg:col-span-8 glass-card rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-white/5 flex flex-col h-[260px] sm:h-[320px]">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-2">
               <Calendar className="w-5 h-5 text-violet-400" />
@@ -218,7 +218,7 @@ export const Dashboard: React.FC = () => {
         </div>
 
         {/* Mode Breakdown */}
-        <div className="lg:col-span-4 glass-card rounded-3xl p-6 border border-white/5 flex flex-col h-[320px]">
+        <div className="lg:col-span-4 glass-card rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-white/5 flex flex-col h-[260px] sm:h-[320px]">
           <h3 className="text-lg font-bold text-white mb-6">Practiced Scenarios</h3>
           
           <div className="flex-1 flex flex-col justify-around">
@@ -251,7 +251,7 @@ export const Dashboard: React.FC = () => {
       </div>
 
       {/* Summary totals */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t border-white/5">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 pt-4 border-t border-white/5">
         <div className="text-center md:text-left">
           <span className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Total Sessions</span>
           <p className="text-2xl font-extrabold text-white mt-1">{stats.total_sessions}</p>

@@ -53,6 +53,9 @@ export const VoiceCoach: React.FC = () => {
   // Microphone Hook
   const { isRecording, recordingTime, audioLevel, startRecording, stopRecording } = useAudioRecorder();
 
+  // Mobile feedback panel toggle
+  const [showFeedbackPanel, setShowFeedbackPanel] = useState(false);
+
   // Mode Options Details
   const modes = [
     { id: 'casual', title: 'Casual Talk', desc: 'Friendly conversation about hobbies, interests, and life.', icon: MessageSquare, gradient: 'from-blue-600 to-indigo-600' },
@@ -311,106 +314,127 @@ export const VoiceCoach: React.FC = () => {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
+  // ─── MODE SELECTION PAGE (scrollable) ───
   if (!activeSession) {
     return (
-      <div className="max-w-5xl mx-auto px-4 py-8">
-        <div className="text-center mb-10">
-          <h1 className="text-4xl font-extrabold tracking-tight text-white mb-2 bg-gradient-to-r from-white via-slate-200 to-violet-400 bg-clip-text text-transparent">
-            Choose Your Speaking Mode
-          </h1>
-          <p className="text-slate-400 max-w-xl mx-auto font-medium">
-            Select a tailored learning mode to begin conversation practice with your AI coach.
-          </p>
-        </div>
-
-        {error && (
-          <div className="mb-6 flex items-start gap-3 p-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-200 text-sm max-w-xl mx-auto">
-            <AlertCircle className="w-5 h-5 shrink-0 text-red-400" />
-            <span>{error}</span>
+      <div className="w-full min-h-full px-4 sm:px-6 py-6 sm:py-8 pb-12 overflow-y-auto">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-8 sm:mb-10">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white mb-2 bg-gradient-to-r from-white via-slate-200 to-violet-400 bg-clip-text text-transparent">
+              Choose Your Speaking Mode
+            </h1>
+            <p className="text-slate-400 max-w-xl mx-auto font-medium text-sm sm:text-base">
+              Select a tailored learning mode to begin conversation practice with your AI coach.
+            </p>
           </div>
-        )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
-          {modes.map((mode) => {
-            const Icon = mode.icon;
-            return (
-              <button
-                key={mode.id}
-                onClick={() => setLearningMode(mode.id)}
-                className={`glass-card p-6 rounded-3xl text-left flex flex-col items-start gap-4 transition-all duration-300 relative overflow-hidden group border ${
-                  learningMode === mode.id 
-                    ? 'border-violet-500/60 bg-violet-600/5 shadow-lg shadow-violet-500/5' 
-                    : 'border-white/5'
-                }`}
-              >
-                <div className={`w-12 h-12 rounded-2xl bg-gradient-to-tr ${mode.gradient} flex items-center justify-center shadow-lg`}>
-                  <Icon className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-bold text-white mb-1.5">{mode.title}</h3>
-                  <p className="text-sm text-slate-400 font-medium leading-relaxed">{mode.desc}</p>
-                </div>
-                {learningMode === mode.id && (
-                  <div className="absolute top-4 right-4 w-2.5 h-2.5 rounded-full bg-violet-500 shadow-md shadow-violet-500/50" />
-                )}
-              </button>
-            );
-          })}
-        </div>
+          {error && (
+            <div className="mb-6 flex items-start gap-3 p-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-200 text-sm max-w-xl mx-auto">
+              <AlertCircle className="w-5 h-5 shrink-0 text-red-400" />
+              <span>{error}</span>
+            </div>
+          )}
 
-        <div className="text-center">
-          <button
-            onClick={startSession}
-            disabled={loading}
-            className="px-8 py-4 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-bold rounded-2xl transition-all duration-200 shadow-xl shadow-violet-500/20 hover:shadow-violet-500/25 px-12 disabled:opacity-50"
-          >
-            {loading ? 'Starting Session...' : 'Start Coaching Session'}
-          </button>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8 sm:mb-10">
+            {modes.map((mode) => {
+              const Icon = mode.icon;
+              return (
+                <button
+                  key={mode.id}
+                  onClick={() => setLearningMode(mode.id)}
+                  className={`glass-card p-5 sm:p-6 rounded-3xl text-left flex flex-col items-start gap-3 sm:gap-4 transition-all duration-300 relative overflow-hidden group border ${
+                    learningMode === mode.id 
+                      ? 'border-violet-500/60 bg-violet-600/5 shadow-lg shadow-violet-500/5' 
+                      : 'border-white/5'
+                  }`}
+                >
+                  <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-tr ${mode.gradient} flex items-center justify-center shadow-lg`}>
+                    <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-base sm:text-lg font-bold text-white mb-1 sm:mb-1.5">{mode.title}</h3>
+                    <p className="text-xs sm:text-sm text-slate-400 font-medium leading-relaxed">{mode.desc}</p>
+                  </div>
+                  {learningMode === mode.id && (
+                    <div className="absolute top-4 right-4 w-2.5 h-2.5 rounded-full bg-violet-500 shadow-md shadow-violet-500/50" />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="text-center pb-4">
+            <button
+              onClick={startSession}
+              disabled={loading}
+              className="px-8 sm:px-12 py-3.5 sm:py-4 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-bold rounded-2xl transition-all duration-200 shadow-xl shadow-violet-500/20 hover:shadow-violet-500/25 disabled:opacity-50 text-sm sm:text-base"
+            >
+              {loading ? 'Starting Session...' : 'Start Coaching Session'}
+            </button>
+          </div>
         </div>
       </div>
     );
   }
 
-  // Active training layout
+  // ─── ACTIVE SESSION PAGE (responsive + scrollable) ───
+
+  // Extract latest feedback for the sidebar
+  const feedbackMsgs = messages.filter(m => m.role === 'user' && m.feedback);
+  const latestFeedbackMsg = feedbackMsgs[feedbackMsgs.length - 1];
+  const latestFeedback = latestFeedbackMsg?.feedback;
+  const hasCorrections = latestFeedback
+    ? latestFeedback.corrected_text.toLowerCase() !== 'no correction needed.' && latestFeedback.corrected_text !== 'N/A'
+    : false;
+
   return (
-    <div className="max-w-5xl mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-12 gap-8 h-[calc(100vh-100px)]">
+    <div className="w-full h-full flex flex-col lg:grid lg:grid-cols-12 lg:gap-6 max-w-6xl mx-auto px-3 sm:px-4 py-3 sm:py-6 overflow-hidden" style={{ height: 'calc(100vh - 70px)' }}>
       {/* Hidden Audio element for autoplaying binary streams */}
       <audio ref={audioRef} className="hidden" />
 
-      {/* Left Column: Chat log / dialogue */}
-      <div className="lg:col-span-7 flex flex-col h-full bg-slate-900/35 border border-white/5 rounded-3xl overflow-hidden glass-panel">
+      {/* ── Chat Column ── */}
+      <div className="lg:col-span-7 flex flex-col min-h-0 flex-1 lg:flex-initial lg:h-full bg-slate-900/35 border border-white/5 rounded-2xl sm:rounded-3xl overflow-hidden glass-panel">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-white/5 flex items-center justify-between bg-slate-950/20">
-          <div className="flex items-center gap-3">
+        <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-white/5 flex items-center justify-between bg-slate-950/20 shrink-0">
+          <div className="flex items-center gap-2 sm:gap-3">
             <button 
               onClick={() => setActiveSession(null)}
-              className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all"
+              className="p-1.5 sm:p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all"
             >
-              <ArrowLeft className="w-5 h-5" />
+              <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
             <div>
-              <span className="text-sm font-bold text-white block capitalize">{learningMode} Coaching</span>
+              <span className="text-xs sm:text-sm font-bold text-white block capitalize">{learningMode} Coaching</span>
               <div className="flex items-center gap-1.5 mt-0.5">
                 <span className={`w-2 h-2 rounded-full ${wsStatus === 'connected' ? 'bg-emerald-500 shadow-md shadow-emerald-500/50' : 'bg-amber-500'}`} />
-                <span className="text-xs text-slate-400 font-semibold">{wsStatus === 'connected' ? 'Online' : 'Reconnecting...'}</span>
+                <span className="text-[10px] sm:text-xs text-slate-400 font-semibold">{wsStatus === 'connected' ? 'Online' : 'Reconnecting...'}</span>
               </div>
             </div>
           </div>
           
-          <div className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-violet-600/10 text-violet-400 border border-violet-500/10">
-            {coachStatus}
+          <div className="flex items-center gap-2">
+            {/* Mobile toggle for feedback panel */}
+            <button
+              onClick={() => setShowFeedbackPanel(!showFeedbackPanel)}
+              className="lg:hidden text-xs font-semibold px-2.5 py-1.5 rounded-lg bg-indigo-600/10 text-indigo-400 border border-indigo-500/10 transition-all hover:bg-indigo-600/20"
+            >
+              {showFeedbackPanel ? 'Chat' : 'Scores'}
+            </button>
+            <div className="text-[10px] sm:text-xs font-semibold px-2.5 sm:px-3 py-1.5 rounded-lg bg-violet-600/10 text-violet-400 border border-violet-500/10 max-w-[140px] sm:max-w-none truncate">
+              {coachStatus}
+            </div>
           </div>
         </div>
 
-        {/* Message logs */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+        {/* Message logs — only shown when feedback panel is hidden on mobile */}
+        <div className={`flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 sm:space-y-6 ${showFeedbackPanel ? 'hidden lg:block' : ''}`}>
           {messages.length === 0 ? (
-            <div className="h-full flex flex-col items-center justify-center text-center px-6">
-              <div className="w-14 h-14 rounded-2xl bg-violet-600/5 flex items-center justify-center text-violet-400 border border-violet-500/10 mb-4 animate-bounce">
-                <Mic className="w-6 h-6" />
+            <div className="h-full flex flex-col items-center justify-center text-center px-4 sm:px-6">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-violet-600/5 flex items-center justify-center text-violet-400 border border-violet-500/10 mb-4 animate-bounce">
+                <Mic className="w-5 h-5 sm:w-6 sm:h-6" />
               </div>
-              <h4 className="text-base font-bold text-slate-200">Start the conversation</h4>
-              <p className="text-xs text-slate-500 max-w-sm mt-1 font-semibold leading-relaxed">
+              <h4 className="text-sm sm:text-base font-bold text-slate-200">Start the conversation</h4>
+              <p className="text-[11px] sm:text-xs text-slate-500 max-w-sm mt-1 font-semibold leading-relaxed">
                 Click the microphone button below, say anything in English, and press stop. Your coach will respond instantly.
               </p>
             </div>
@@ -419,7 +443,7 @@ export const VoiceCoach: React.FC = () => {
               const isUser = msg.role === 'user';
               return (
                 <div key={msg.id} className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`max-w-[85%] rounded-2xl p-4 leading-relaxed text-sm ${
+                  <div className={`max-w-[90%] sm:max-w-[85%] rounded-2xl p-3 sm:p-4 leading-relaxed text-xs sm:text-sm ${
                     isUser 
                       ? 'bg-violet-600 text-white rounded-br-none shadow-md shadow-violet-500/5' 
                       : 'bg-slate-900 border border-white/5 text-slate-200 rounded-bl-none'
@@ -432,7 +456,7 @@ export const VoiceCoach: React.FC = () => {
           )}
           {processing && (
             <div className="flex justify-start">
-              <div className="bg-slate-900 border border-white/5 rounded-2xl rounded-bl-none p-4 text-slate-400 flex items-center gap-2 text-sm">
+              <div className="bg-slate-900 border border-white/5 rounded-2xl rounded-bl-none p-3 sm:p-4 text-slate-400 flex items-center gap-2 text-sm">
                 <span className="w-1.5 h-1.5 bg-violet-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
                 <span className="w-1.5 h-1.5 bg-violet-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
                 <span className="w-1.5 h-1.5 bg-violet-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
@@ -443,19 +467,24 @@ export const VoiceCoach: React.FC = () => {
           <div ref={messagesEndRef} />
         </div>
 
+        {/* Mobile: inline feedback panel (shown when toggled) */}
+        <div className={`flex-1 overflow-y-auto p-4 space-y-4 lg:hidden ${showFeedbackPanel ? '' : 'hidden'}`}>
+          {renderFeedbackContent(latestFeedback, hasCorrections)}
+        </div>
+
         {/* Microphone action bar */}
-        <div className="p-6 border-t border-white/5 bg-slate-950/20">
+        <div className="p-4 sm:p-6 border-t border-white/5 bg-slate-950/20 shrink-0">
           {error && (
-            <div className="mb-4 flex items-center gap-2 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-200 text-xs">
-              <AlertCircle className="w-4 h-4 shrink-0 text-red-400" />
-              <span>{error}</span>
+            <div className="mb-3 sm:mb-4 flex items-center gap-2 p-2.5 sm:p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-200 text-[11px] sm:text-xs">
+              <AlertCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 text-red-400" />
+              <span className="line-clamp-2">{error}</span>
             </div>
           )}
 
-          <div className="flex flex-col items-center justify-center gap-3">
+          <div className="flex flex-col items-center justify-center gap-2 sm:gap-3">
             {/* Visualizer volume animation */}
             {isRecording && (
-              <div className="flex items-center gap-1 h-6">
+              <div className="flex items-center gap-1 h-5 sm:h-6">
                 {[...Array(6)].map((_, i) => {
                   const scale = 0.2 + (audioLevel / 100) * (0.8 * (i % 2 === 0 ? 0.9 : 1.2));
                   return (
@@ -469,20 +498,20 @@ export const VoiceCoach: React.FC = () => {
               </div>
             )}
 
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3 sm:gap-4">
               <button
                 onClick={toggleRecording}
                 disabled={processing || wsStatus !== 'connected'}
-                className={`w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300 relative shadow-lg ${
+                className={`w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center transition-all duration-300 relative shadow-lg ${
                   isRecording 
                     ? 'bg-red-500 hover:bg-red-400 shadow-red-500/20 scale-105' 
                     : 'bg-violet-600 hover:bg-violet-500 shadow-violet-500/20'
                 } disabled:opacity-50 disabled:pointer-events-none`}
               >
-                {isRecording ? <Square className="w-6 h-6 text-white" /> : <Mic className="w-7 h-7 text-white" />}
+                {isRecording ? <Square className="w-5 h-5 sm:w-6 sm:h-6 text-white" /> : <Mic className="w-6 h-6 sm:w-7 sm:h-7 text-white" />}
                 
                 {isRecording && (
-                  <span className="absolute -inset-2.5 rounded-full border border-red-500/30 animate-ping pointer-events-none" />
+                  <span className="absolute -inset-2 sm:-inset-2.5 rounded-full border border-red-500/30 animate-ping pointer-events-none" />
                 )}
               </button>
 
@@ -493,89 +522,84 @@ export const VoiceCoach: React.FC = () => {
               )}
             </div>
             
-            <span className="text-[11px] text-slate-500 font-semibold tracking-wide uppercase">
+            <span className="text-[10px] sm:text-[11px] text-slate-500 font-semibold tracking-wide uppercase">
               {isRecording ? 'Click to submit speaking' : 'Click microphone to speak'}
             </span>
           </div>
         </div>
       </div>
 
-      {/* Right Column: Real-time grammar & score feedback */}
-      <div className="lg:col-span-5 flex flex-col h-full space-y-6">
-        <h3 className="text-xl font-bold text-white flex items-center gap-2">
+      {/* ── Right Column: Feedback Panel (desktop only) ── */}
+      <div className="hidden lg:flex lg:col-span-5 flex-col h-full space-y-4 sm:space-y-6 min-h-0">
+        <h3 className="text-lg sm:text-xl font-bold text-white flex items-center gap-2 shrink-0">
           <Volume2 className="w-5 h-5 text-violet-400" />
           Speech Evaluations
         </h3>
 
-        <div className="flex-1 overflow-y-auto space-y-6 pr-1">
-          {/* Loop messages to find the latest user message containing feedback */}
-          {(() => {
-            const feedbackMsgs = messages.filter(m => m.role === 'user' && m.feedback);
-            const latestMsg = feedbackMsgs[feedbackMsgs.length - 1];
-
-            if (!latestMsg || !latestMsg.feedback) {
-              return (
-                <div className="glass-card rounded-3xl p-6 border border-white/5 text-center flex flex-col items-center justify-center h-48">
-                  <p className="text-slate-400 text-sm font-medium">No evaluations yet.</p>
-                  <p className="text-xs text-slate-500 mt-1">Speak to see real-time grammar corrections, vocabulary suggestions, and scoring metrics here.</p>
-                </div>
-              );
-            }
-
-            const feedback = latestMsg.feedback;
-            const hasCorrections = feedback.corrected_text.toLowerCase() !== 'no correction needed.' && 
-                                   feedback.corrected_text !== 'N/A';
-
-            return (
-              <div className="space-y-5">
-                {/* Score Panel */}
-                <div className="grid grid-cols-3 gap-3">
-                  <div className="glass-card rounded-2xl p-4 border border-white/5 text-center">
-                    <span className="text-xs text-slate-400 font-semibold block mb-1">Grammar</span>
-                    <span className="text-2xl font-black text-violet-400">{feedback.scores.grammar}</span>
-                  </div>
-                  <div className="glass-card rounded-2xl p-4 border border-white/5 text-center">
-                    <span className="text-xs text-slate-400 font-semibold block mb-1">Vocabulary</span>
-                    <span className="text-2xl font-black text-indigo-400">{feedback.scores.vocabulary}</span>
-                  </div>
-                  <div className="glass-card rounded-2xl p-4 border border-white/5 text-center">
-                    <span className="text-xs text-slate-400 font-semibold block mb-1">Fluency</span>
-                    <span className="text-2xl font-black text-emerald-400">{feedback.scores.fluency}</span>
-                  </div>
-                </div>
-
-                {/* Correction Panel */}
-                <div className="glass-card rounded-3xl p-6 border border-white/5 space-y-4">
-                  <div>
-                    <span className="text-xs text-slate-400 font-bold tracking-wider uppercase block mb-1.5">You Said:</span>
-                    <p className="text-sm text-slate-300 italic">"{feedback.original_text}"</p>
-                  </div>
-                  
-                  <div className="border-t border-white/5 pt-4">
-                    <span className="text-xs text-slate-400 font-bold tracking-wider uppercase block mb-1.5">Corrected:</span>
-                    <p className={`text-sm ${hasCorrections ? 'text-emerald-400 font-medium' : 'text-slate-300'}`}>
-                      {hasCorrections ? `"${feedback.corrected_text}"` : 'No grammar corrections needed!'}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Explanation / Notes Panel */}
-                <div className="glass-card rounded-3xl p-6 border border-white/5 space-y-4">
-                  <div>
-                    <span className="text-xs text-violet-400 font-bold tracking-wider uppercase block mb-1.5">Grammar Explanation:</span>
-                    <p className="text-xs text-slate-400 font-medium leading-relaxed">{feedback.explanation}</p>
-                  </div>
-                  
-                  <div className="border-t border-white/5 pt-4">
-                    <span className="text-xs text-indigo-400 font-bold tracking-wider uppercase block mb-1.5">Vocabulary Suggestions:</span>
-                    <p className="text-xs text-slate-400 font-medium leading-relaxed">{feedback.suggestions}</p>
-                  </div>
-                </div>
-              </div>
-            );
-          })()}
+        <div className="flex-1 overflow-y-auto space-y-5 pr-1">
+          {renderFeedbackContent(latestFeedback, hasCorrections)}
         </div>
       </div>
     </div>
   );
 };
+
+// ─── Extracted feedback panel content (shared between mobile toggle and desktop sidebar) ───
+function renderFeedbackContent(feedback: FeedbackData | undefined, hasCorrections: boolean) {
+  if (!feedback) {
+    return (
+      <div className="glass-card rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-white/5 text-center flex flex-col items-center justify-center h-40 sm:h-48">
+        <p className="text-slate-400 text-xs sm:text-sm font-medium">No evaluations yet.</p>
+        <p className="text-[11px] sm:text-xs text-slate-500 mt-1">Speak to see real-time grammar corrections, vocabulary suggestions, and scoring metrics here.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4 sm:space-y-5">
+      {/* Score Panel */}
+      <div className="grid grid-cols-3 gap-2 sm:gap-3">
+        <div className="glass-card rounded-xl sm:rounded-2xl p-3 sm:p-4 border border-white/5 text-center">
+          <span className="text-[10px] sm:text-xs text-slate-400 font-semibold block mb-1">Grammar</span>
+          <span className="text-xl sm:text-2xl font-black text-violet-400">{feedback.scores.grammar}</span>
+        </div>
+        <div className="glass-card rounded-xl sm:rounded-2xl p-3 sm:p-4 border border-white/5 text-center">
+          <span className="text-[10px] sm:text-xs text-slate-400 font-semibold block mb-1">Vocabulary</span>
+          <span className="text-xl sm:text-2xl font-black text-indigo-400">{feedback.scores.vocabulary}</span>
+        </div>
+        <div className="glass-card rounded-xl sm:rounded-2xl p-3 sm:p-4 border border-white/5 text-center">
+          <span className="text-[10px] sm:text-xs text-slate-400 font-semibold block mb-1">Fluency</span>
+          <span className="text-xl sm:text-2xl font-black text-emerald-400">{feedback.scores.fluency}</span>
+        </div>
+      </div>
+
+      {/* Correction Panel */}
+      <div className="glass-card rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-white/5 space-y-3 sm:space-y-4">
+        <div>
+          <span className="text-[10px] sm:text-xs text-slate-400 font-bold tracking-wider uppercase block mb-1 sm:mb-1.5">You Said:</span>
+          <p className="text-xs sm:text-sm text-slate-300 italic">"{feedback.original_text}"</p>
+        </div>
+        
+        <div className="border-t border-white/5 pt-3 sm:pt-4">
+          <span className="text-[10px] sm:text-xs text-slate-400 font-bold tracking-wider uppercase block mb-1 sm:mb-1.5">Corrected:</span>
+          <p className={`text-xs sm:text-sm ${hasCorrections ? 'text-emerald-400 font-medium' : 'text-slate-300'}`}>
+            {hasCorrections ? `"${feedback.corrected_text}"` : 'No grammar corrections needed!'}
+          </p>
+        </div>
+      </div>
+
+      {/* Explanation / Notes Panel */}
+      <div className="glass-card rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-white/5 space-y-3 sm:space-y-4">
+        <div>
+          <span className="text-[10px] sm:text-xs text-violet-400 font-bold tracking-wider uppercase block mb-1 sm:mb-1.5">Grammar Explanation:</span>
+          <p className="text-[11px] sm:text-xs text-slate-400 font-medium leading-relaxed">{feedback.explanation}</p>
+        </div>
+        
+        <div className="border-t border-white/5 pt-3 sm:pt-4">
+          <span className="text-[10px] sm:text-xs text-indigo-400 font-bold tracking-wider uppercase block mb-1 sm:mb-1.5">Vocabulary Suggestions:</span>
+          <p className="text-[11px] sm:text-xs text-slate-400 font-medium leading-relaxed">{feedback.suggestions}</p>
+        </div>
+      </div>
+    </div>
+  );
+}

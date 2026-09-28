@@ -22,9 +22,17 @@ Since Hugging Face container storage is wiped on restart, we recommend using a f
 *Note: If `DB_URL` is omitted, the app will fall back to local SQLite, but your chat logs and user registrations will be wiped when the Space restarts or goes to sleep.*
 
 ### LLM Coaching Brain Settings
-Since local Ollama Llama 3.1 8B cannot run on the free Hugging Face CPU tier, configure the OpenAI-compatible path to query **Groq** (Recommended - ultra fast) or **Hugging Face Serverless Inference API** (Free with a user token).
+Since local Ollama Llama 3.1 8B cannot run on the free Hugging Face CPU tier, configure the OpenAI-compatible path to query **Groq**, **Google Gemini API** (Recommended), or **Hugging Face Serverless Inference API**.
 
-#### Option A: Groq API (Recommended for performance)
+#### Option A: Google Gemini API (Recommended for Quality & Free Limits)
+| Key | Type | Value |
+| :--- | :--- | :--- |
+| `LLM_PROVIDER` | Variable | `openai` |
+| `LLM_API_KEY` | Secret | `AIzaSy_your_gemini_api_key` (Get a free key from Google AI Studio) |
+| `LLM_API_URL` | Variable | `https://generativelanguage.googleapis.com/v1beta/openai/chat/completions` (Optional, auto-detected) |
+| `LLM_MODEL` | Variable | `gemini-1.5-flash` (Optional, auto-detected) |
+
+#### Option B: Groq API (Recommended for speed)
 | Key | Type | Value |
 | :--- | :--- | :--- |
 | `LLM_PROVIDER` | Variable | `openai` |
@@ -32,11 +40,11 @@ Since local Ollama Llama 3.1 8B cannot run on the free Hugging Face CPU tier, co
 | `LLM_API_URL` | Variable | `https://api.groq.com/openai/v1/chat/completions` |
 | `LLM_MODEL` | Variable | `llama-3.1-8b-instant` |
 
-#### Option B: Hugging Face Serverless Inference API
+#### Option C: Hugging Face Serverless Inference API
 | Key | Type | Value |
 | :--- | :--- | :--- |
 | `LLM_PROVIDER` | Variable | `openai` |
-| `LLM_API_KEY` | Secret | `hf_your_huggingface_user_token_here` (Generate a write/read token in HF settings) |
+| `LLM_API_KEY` | Secret | `hf_your_huggingface_user_token_here` (Generate a token in HF settings) |
 | `LLM_API_URL` | Variable | `https://api-inference.huggingface.co/v1/chat/completions` |
 | `LLM_MODEL` | Variable | `meta-llama/Llama-3.1-8B-Instruct` |
 

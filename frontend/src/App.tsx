@@ -35,7 +35,7 @@ const MainApp: React.FC = () => {
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
       <Navbar currentTab={currentTab} setCurrentTab={setCurrentTab} />
       
-      <main className="flex-1 bg-slate-950 relative overflow-hidden">
+      <main className="flex-1 bg-slate-950 relative overflow-x-hidden overflow-y-auto">
         {/* Background visual graphics */}
         <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-violet-600/5 rounded-full blur-[120px] pointer-events-none" />
         
