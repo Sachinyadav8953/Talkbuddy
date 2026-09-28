@@ -1,6 +1,7 @@
 import os
 import platform
 import shutil
+import sys
 import urllib.request
 import zipfile
 import tarfile
@@ -36,6 +37,24 @@ def get_piper_executable_path() -> str:
     target_path_direct = os.path.join(settings.PIPER_BIN_DIR, bin_name)
     if os.path.exists(target_path_direct):
         return target_path_direct
+    
+    # Check pip-installed piper in Python Scripts directory
+    scripts_dir = os.path.join(os.path.dirname(sys.executable), "Scripts")
+    pip_path = os.path.join(scripts_dir, bin_name)
+    if os.path.exists(pip_path):
+        return pip_path
+    
+    # Check user site-packages Scripts (pip install --user)
+    user_scripts = os.path.join(os.path.expanduser("~"), "AppData", "Roaming", "Python",
+                                f"Python{sys.version_info.major}{sys.version_info.minor}", "Scripts")
+    user_pip_path = os.path.join(user_scripts, bin_name)
+    if os.path.exists(user_pip_path):
+        return user_pip_path
+    
+    # Last resort: check PATH via shutil.which
+    which_path = shutil.which("piper")
+    if which_path:
+        return which_path
         
     return ""
 

@@ -78,14 +78,24 @@ class LLMService:
 
         if provider == "openai":
             url = settings.LLM_API_URL
+            model = settings.LLM_MODEL
+            
+            # Detect Gemini API key (starts with AIzaSy)
+            is_gemini = settings.LLM_API_KEY and settings.LLM_API_KEY.startswith("AIzaSy")
+            
             if not url:
                 if settings.LLM_API_KEY and settings.LLM_API_KEY.startswith("gsk_"):
                     url = "https://api.groq.com/openai/v1/chat/completions"
+                elif is_gemini:
+                    url = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"
                 else:
                     url = "https://api-inference.huggingface.co/v1/chat/completions"
             
+            if is_gemini and (model == "llama3.1" or not model):
+                model = "gemini-1.5-flash"
+            
             payload = {
-                "model": settings.LLM_MODEL,
+                "model": model,
                 "messages": messages,
                 "temperature": 0.7,
                 "stream": False
@@ -96,7 +106,7 @@ class LLMService:
             if settings.LLM_API_KEY:
                 headers["Authorization"] = f"Bearer {settings.LLM_API_KEY}"
 
-            logger.info(f"Querying OpenAI-compatible API at {url} with model {settings.LLM_MODEL} for mode '{mode}'...")
+            logger.info(f"Querying OpenAI-compatible API at {url} with model {model} for mode '{mode}'...")
             try:
                 response = requests.post(
                     url,

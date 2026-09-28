@@ -60,9 +60,16 @@ app = FastAPI(
 )
 
 # CORS middleware configuration
+# allow_origins=["*"] is invalid when allow_credentials=True per the CORS spec.
+# Set ALLOWED_ORIGINS env var to a comma-separated list of allowed frontend URLs.
+allowed_origins = os.getenv(
+    "ALLOWED_ORIGINS",
+    "http://localhost:5173,http://localhost:3000"
+).split(",")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Adjust for production security if needed
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
