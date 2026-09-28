@@ -22,31 +22,45 @@ logging.basicConfig(
 logger = logging.getLogger("talkbuddy.main")
 
 
+import asyncio
+
+async def background_asset_warmup():
+    """Background task to download and cache models without blocking port binding."""
+    loop = asyncio.get_running_loop()
+    try:
+        logger.info("Background task: Checking and downloading Piper TTS assets...")
+        await loop.run_in_executor(None, bootstrap_assets)
+        logger.info("Piper TTS assets are ready.")
+    except Exception as e:
+        logger.error(f"Startup bootstrap failed: {str(e)}")
+
+    try:
+        logger.info("Background task: Pre-loading Whisper STT model...")
+        await loop.run_in_executor(None, stt_service.load_model)
+        logger.info("Whisper model pre-load complete.")
+    except Exception as e:
+        logger.error(f"Whisper model pre-load failed: {str(e)}")
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Application lifecycle manager — replaces deprecated @app.on_event('startup')."""
     # --- Startup ---
     logger.info("Initializing database tables...")
-    Base.metadata.create_all(bind=engine)
+    try:
+        Base.metadata.create_all(bind=engine)
+        logger.info("Database tables initialized.")
+    except Exception as e:
+        logger.error(f"Database initialization error: {e}")
 
     # Create temp audio folder if missing
     os.makedirs(settings.TEMP_AUDIO_DIR, exist_ok=True)
 
-    # Download Piper + voice model binaries
-    try:
-        bootstrap_assets()
-        logger.info("All startup requirements validated successfully.")
-    except Exception as e:
-        logger.error(f"Startup bootstrap failed: {str(e)}")
-        # Allow application to run so it returns meaningful error messages
+    # Schedule heavy model downloads as a non-blocking background task
+    # This allows FastAPI to bind to the port immediately so Render health checks succeed!
+    asyncio.create_task(background_asset_warmup())
 
-    # Pre-load Whisper model at startup to avoid first-request latency
-    try:
-        stt_service.load_model()
-    except Exception as e:
-        logger.error(f"Whisper model pre-load failed: {str(e)}")
-
-    logger.info("Application startup complete.")
+    logger.info("Application startup complete. Ready and listening for incoming connections.")
     yield  # Application runs here
 
     # --- Shutdown ---
@@ -60,20 +74,33 @@ app = FastAPI(
 )
 
 # CORS middleware configuration
-# allow_origins=["*"] is invalid when allow_credentials=True per the CORS spec.
-# Set ALLOWED_ORIGINS env var to a comma-separated list of allowed frontend URLs.
-allowed_origins = os.getenv(
-    "ALLOWED_ORIGINS",
-    "http://localhost:5173,http://localhost:3000"
-).split(",")
+raw_origins = os.getenv("ALLOWED_ORIGINS", "*").strip()
+# Clean list of origins
+parsed_origins = [o.strip().rstrip("/") for o in raw_origins.split(",") if o.strip()]
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=allowed_origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# If ALLOWED_ORIGINS is '*' or unset, allow all web origins with allow_origin_regex
+if not parsed_origins or "*" in parsed_origins:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origin_regex=r"^https?://.*",
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+else:
+    # Always include localhost defaults along with user-specified origins
+    default_dev_origins = [
+        "http://localhost:5173", "http://localhost:3000",
+        "http://127.0.0.1:5173", "http://127.0.0.1:3000"
+    ]
+    all_allowed = list(set(parsed_origins + default_dev_origins))
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=all_allowed,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
 # Register HTTP routers
 app.include_router(auth.router, prefix=settings.API_V1_STR)
@@ -86,4 +113,10 @@ app.include_router(websocket_router, prefix=settings.API_V1_STR)
 
 @app.get("/")
 def read_root():
-    return {"message": "Welcome to TalkBuddy AI English Speaking Coach API"}
+    return {"status": "ok", "message": "Welcome to TalkBuddy AI English Speaking Coach API"}
+
+
+@app.get("/health")
+def health_check():
+    return {"status": "healthy"}
+
