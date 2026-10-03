@@ -45,7 +45,8 @@ class Settings(BaseSettings):
     LLM_PROVIDER: str = "ollama"  # options: ollama, openai
     LLM_API_URL: str | None = None  # e.g., https://api.groq.com/openai/v1/chat/completions
     LLM_API_KEY: str | None = None
-    LLM_MODEL: str = "llama3.1"   # e.g., llama3.1 (Ollama) or llama-3.1-8b-instant (Groq)
+    LLM_MODEL: str = "qwen/qwen3.8-27b"   # e.g., qwen/qwen3.8-27b (Groq) or llama3.1 (Ollama)
+
 
     WHISPER_MODEL: str = "base"  # options: tiny, base, small, medium
     WHISPER_DEVICE: str = "cpu"  # cpu or cuda
