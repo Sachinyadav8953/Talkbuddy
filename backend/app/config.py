@@ -21,11 +21,20 @@ class Settings(BaseSettings):
 
     @property
     def DATABASE_URL(self) -> str:
-        url = self.DB_URL or os.getenv("DATABASE_URL")
-        if url:
+        url = self.DB_URL or os.getenv("DATABASE_URL") or os.getenv("DB_URL")
+        if url and url.strip():
+            url = url.strip()
             if url.startswith("postgres://"):
                 url = url.replace("postgres://", "postgresql://", 1)
             return url
+
+        # If running in cloud (Render, etc.) and no external PostgreSQL was configured,
+        # fallback to SQLite so user registration and app work without 500 error!
+        is_cloud = bool(os.getenv("RENDER") or os.getenv("PORT") or os.getenv("SPACE_ID"))
+        if is_cloud:
+            db_file = os.path.join(self.BASE_DIR, "talkbuddy.db")
+            return f"sqlite:///{db_file}"
+
         return f"postgresql://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
 
     # AI Model Settings (Ollama fallback)

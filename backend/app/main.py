@@ -102,6 +102,17 @@ else:
         allow_headers=["*"],
     )
 
+from fastapi import Request
+from fastapi.responses import JSONResponse
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    logger.error(f"Global unhandled error on {request.method} {request.url.path}: {exc}", exc_info=True)
+    return JSONResponse(
+        status_code=500,
+        content={"detail": f"Internal server error: {str(exc)}"}
+    )
+
 # Register HTTP routers
 app.include_router(auth.router, prefix=settings.API_V1_STR)
 app.include_router(sessions.router, prefix=settings.API_V1_STR)
@@ -119,4 +130,5 @@ def read_root():
 @app.get("/health")
 def health_check():
     return {"status": "healthy"}
+
 
